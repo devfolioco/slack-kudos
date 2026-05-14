@@ -65,8 +65,7 @@ Copy `.env.example` to `.env` for local development.
 | `SLACK_BOT_TOKEN` | Yes | Slack bot token |
 | `SLACK_SIGNING_SECRET` | Yes | Verifies Slack requests in HTTP mode |
 | `KUDOS_CHANNEL_ID` | Yes | Channel that receives kudos posts |
-| `SLACK_BOT_USER_ID` | Optional | Bot's own user ID (`Uxxx`); enables the "can't kudos the bot" fail-safe |
-| `OPENROUTER_API_KEY` | Optional | Enables AI-generated thread summaries via OpenRouter |
+| `OPENAI_API_KEY` | Optional | Enables AI-generated thread summaries |
 | `SLACK_APP_TOKEN` | Optional | Enables local Socket Mode |
 
 ## Running Locally

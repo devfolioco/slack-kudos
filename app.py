@@ -6,6 +6,7 @@ import os
 import random
 from typing import List
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from slack_bolt import App as BoltApp
 from slack_bolt.adapter.flask import SlackRequestHandler
@@ -13,9 +14,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from summarizer import summarize_thread
 
-if os.path.exists(".env"):
-    from dotenv import load_dotenv
-    load_dotenv()
+load_dotenv()
 
 bolt_app = BoltApp(
     token=os.environ.get("SLACK_BOT_TOKEN"),
@@ -26,7 +25,6 @@ slack_handler = SlackRequestHandler(bolt_app)
 app = Flask(__name__)
 
 KUDOS_CHANNEL_ID = os.environ.get("KUDOS_CHANNEL_ID")
-BOT_USER_ID = os.environ.get("SLACK_BOT_USER_ID", "")
 
 CELEBRATION_EMOJIS = ["🎉", "🙌", "⭐", "🚀", "💪", "🔥", "✨", "👏", "💯", "🏆"]
 
@@ -182,6 +180,16 @@ def handle_give_kudos_shortcut(ack, shortcut, client):
     )
 
 
+def get_bot_user_id(client) -> str:
+    """Get the bot's own user ID."""
+    try:
+        result = client.auth_test()
+        return result.get("user_id", "")
+    except Exception as e:
+        print(f"Error getting bot user ID: {e}")
+        return ""
+
+
 def send_ephemeral_message(client, channel_id: str, user_id: str, message: str):
     """Send an ephemeral message only visible to the user."""
     try:
@@ -220,7 +228,8 @@ def handle_kudos_modal_submission(ack, body, client, view):
         return
 
     # Funny fail-safe: Prevent kudos to the bot itself
-    if BOT_USER_ID and receiver_id == BOT_USER_ID:
+    bot_user_id = get_bot_user_id(client)
+    if receiver_id == bot_user_id:
         if channel_id:
             send_ephemeral_message(client, channel_id, sender_id, random.choice(BOT_KUDOS_MESSAGES))
         return
