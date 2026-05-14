@@ -1,4 +1,4 @@
-# Slack Kudos Bot
+# Slack Kudos Bot (v1.0)
 Made for Devfolio
 
 A lightweight Slack bot for turning a message shortcut into a public kudos post.
