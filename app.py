@@ -34,7 +34,7 @@ bolt_app.client.ssl = ssl.create_default_context()
 bolt_app.client.retry_handlers.append(
     ConnectionErrorRetryHandler(
         max_retry_count=3,
-        interval_calculator=FixedValueRetryIntervalCalculator(fixed_interval=0.2),
+        interval_calculator=FixedValueRetryIntervalCalculator(fixed_internal=0.2),
     )
 )
 slack_handler = SlackRequestHandler(bolt_app)
