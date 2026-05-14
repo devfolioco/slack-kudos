@@ -4,17 +4,12 @@ Slack Kudos Bot application entrypoint.
 
 import os
 import random
-import ssl
 from typing import List
 
 from flask import Flask, jsonify, request
 from slack_bolt import App as BoltApp
 from slack_bolt.adapter.flask import SlackRequestHandler
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from slack_sdk.http_retry.builtin_handlers import ConnectionErrorRetryHandler
-from slack_sdk.http_retry.builtin_interval_calculators import (
-    FixedValueRetryIntervalCalculator,
-)
 
 from summarizer import summarize_thread
 
@@ -25,17 +20,6 @@ if os.path.exists(".env"):
 bolt_app = BoltApp(
     token=os.environ.get("SLACK_BOT_TOKEN"),
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
-)
-# Workaround: serverless containers see stale TLS sessions on warm starts,
-# causing intermittent SSL EOF errors. Force a fresh SSL context and bump
-# retries with a short fixed interval so views.open stays inside Slack's
-# 3-second trigger_id window.
-bolt_app.client.ssl = ssl.create_default_context()
-bolt_app.client.retry_handlers.append(
-    ConnectionErrorRetryHandler(
-        max_retry_count=3,
-        interval_calculator=FixedValueRetryIntervalCalculator(fixed_interval=0.2),
-    )
 )
 slack_handler = SlackRequestHandler(bolt_app)
 
